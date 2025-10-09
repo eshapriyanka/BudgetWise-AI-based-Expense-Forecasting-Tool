@@ -122,3 +122,20 @@ The project has a clear roadmap for future development:
 * Interpretability: Keep models as interpretable as possible so users can understand the basis of the forecasts.
 * Iterative Development: Start with simple, effective models (like ARIMA or Prophet) and progressively add complexity (like LSTMs).
 * Usability Focus: The primary focus will be on creating a usable and helpful tool for the end-user.
+
+
+## Project Timeline and Milestones
+### Milestone_1
+#### Week 1 :
+* Covered foundational AI/ML concepts relevant to the project.
+* Received an in-depth introduction to the project scope, goals, and real-world applications.
+
+#### Week 2 :
+* Focused on practical learning and upskilling.
+* Completed tutorials for Python, covering basic data structures and programming concepts.
+* Gained practical experience with core ML libraries, including Pandas for data manipulation, NumPy for numerical operations and data visualizations.
+
+#### Week 3 :
+* Successfully sourced and finalized the dataset required for the forecasting model.
+* Researched and confirmed the technology stack for the project (Python, Streamlit, Statsmodels, etc.).
+* Initiated the first phase of development, including data cleaning, preprocessing, and the initial setup for model training.
