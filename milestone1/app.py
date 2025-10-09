@@ -57,7 +57,7 @@ mae = mean_absolute_error(results['Actual'], results['Predicted'])
 mse = mean_squared_error(results['Actual'], results['Predicted'])
 rmse = np.sqrt(mse)
 
-st.subheader("📊 Model Evaluation Metrics")
+st.subheader("Model Evaluation Metrics")
 st.write(f"**Mean Absolute Error (MAE):** {mae:.2f}")
 st.write(f"**Mean Squared Error (MSE):** {mse:.2f}")
 st.write(f"**Root Mean Squared Error (RMSE):** {rmse:.2f}")
@@ -75,7 +75,7 @@ ax.legend()
 st.pyplot(fig)
 
 # --- Future Forecast ---
-st.subheader("🔮 Future Expense Forecast")
+st.subheader("Future Expense Forecast")
 
 months_to_predict = st.slider("Select number of months to forecast:", 1, 12, 6)
 future_forecast = model_fit.forecast(steps=months_to_predict)
@@ -90,7 +90,7 @@ future_df['Adjusted_Expense'] = future_df['Predicted_Expense'] + extra_expense
 st.write("### Future Expense Forecast")
 st.dataframe(future_df)
 
-st.subheader("📊 Future Forecast Chart")
+st.subheader("Future Forecast Chart")
 fig2, ax2 = plt.subplots(figsize=(10, 5))
 ax2.plot(future_df.index, future_df['Predicted_Expense'], label='Predicted Expense', color='blue')
 ax2.plot(future_df.index, future_df['Adjusted_Expense'], label='Adjusted (with your input)', color='orange', linestyle='--')
