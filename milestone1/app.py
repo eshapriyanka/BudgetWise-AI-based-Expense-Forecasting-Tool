@@ -63,7 +63,7 @@ st.write(f"**Mean Squared Error (MSE):** {mse:.2f}")
 st.write(f"**Root Mean Squared Error (RMSE):** {rmse:.2f}")
 
 # --- Visualization ---
-st.subheader("📈 Expense Forecast vs Actual Data")
+st.subheader("Expense Forecast vs Actual Data")
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(train_data[expense_col], label='Training Data', color='skyblue')
 ax.plot(test_data[expense_col], label='Actual Data', color='green')
