@@ -9,7 +9,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 st.title("💰 Personal Finance Expense Forecasting App")
 
 # File path for dataset
-file_path = r'C:\Users\Thota Ravindranath\Downloads\personal_finance_tracker_dataset.csv'
+file_path = 'personal_finance_tracker_dataset.csv'
 
 # Load dataset
 df = pd.read_csv(file_path)
