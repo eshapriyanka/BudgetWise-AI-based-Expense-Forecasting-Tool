@@ -6,14 +6,14 @@ from statsmodels.tsa.arima.model import ARIMA
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 # Streamlit App Title
-st.title("💰 Personal Finance Expense Forecasting App")
+st.title("Personal Finance Expense Forecasting App")
 
 # File path for dataset
 file_path = 'personal_finance_tracker_dataset.csv'
 
 # Load dataset
 df = pd.read_csv(file_path)
-st.write("✅ Dataset loaded successfully!")
+st.write("Dataset loaded successfully!")
 st.write("Shape:", df.shape)
 st.write("Columns:", df.columns.tolist())
 
