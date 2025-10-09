@@ -24,7 +24,7 @@ top_user = df_subset['user_id'].value_counts().idxmax()
 df_user = df_subset[df_subset['user_id'] == top_user].copy()
 df_user.set_index(date_col, inplace=True)
 
-# Step 4: modify nulls & add monthly expe
+# modify nulls & add monthly expe
 df_monthly = df_user[[expense_col]].resample('MS').sum().sort_index()
 df_monthly = df_monthly.replace(0, np.nan).ffill()
 
