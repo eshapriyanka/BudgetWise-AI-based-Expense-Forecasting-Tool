@@ -126,16 +126,16 @@ The project has a clear roadmap for future development:
 
 ## Project Timeline and Milestones
 ### Milestone_1
-#### Week 1 :
+#### Week 1 : 22 Sept, 2025 to 26 Sept, 2025
 * Covered foundational AI/ML concepts relevant to the project.
 * Received an in-depth introduction to the project scope, goals, and real-world applications.
 
-#### Week 2 :
+#### Week 2 : 29 Sept, 2025 to 3 Oct, 2025 
 * Focused on practical learning and upskilling.
 * Completed tutorials for Python, covering basic data structures and programming concepts.
 * Gained practical experience with core ML libraries, including Pandas for data manipulation, NumPy for numerical operations and data visualizations.
 
-#### Week 3 :
+#### Week 3 : 6 Oct, 2025 to 10 Oct, 2025
 * Successfully sourced and finalized the dataset required for the forecasting model.
 * Researched and confirmed the technology stack for the project (Python, Streamlit, Statsmodels, etc.).
 * Initiated the first phase of development, including data cleaning, preprocessing, and the initial setup for model training.
