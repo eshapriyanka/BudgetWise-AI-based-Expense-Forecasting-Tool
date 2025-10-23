@@ -9,6 +9,66 @@ Effective budget management is a common challenge for many. The core problems th
 * Inefficiency of Manual Budgeting: Traditional methods of manually tracking expenses are often time-consuming, tedious, and prone to human error.
 * Difficulty in Future Planning: Accurately estimating future expenses is difficult, making long-term financial planning and savings a significant challenge.
 
+## 3.0 Outcomes
+* Clear Financial Overview: Provide users with an easy-to-understand dashboard of their income, expenses, and savings.
+* Automated Expense Forecasting: Predict future spending based on historical data, helping users anticipate financial needs.
+* Spending Pattern Identification: Automatically categorize transactions and highlight key spending areas.
+* Goal-Oriented Planning: Assist users in setting and tracking progress towards financial goals (e.g., saving for a down payment, retirement).
+* Data-Driven Insights: Empower users to identify areas for potential savings and improve budgeting habits.
+* User-Friendly Interface: An intuitive platform for inputting transactions, viewing reports, and interacting with forecasts.
+
+## 4.0 Modules to be implemented
+* User Authentication & Profile Management:
+  * User registration, login(standard email/pass)
+  * Basic user profile for managing financial data and preferences
+* Transaction Ingestion & Categorization Module:
+  * Interface for users to manually input or upload simulated/dummy transaction data (ee.g., CSV).
+  * Automated (or semi-automated, rule-based) categorization of transactions (e.g., 'Groceries', 'Utilities', 'Transport').
+* Data Analysis & Reporting Module:
+  * Calculate spending summaries per category, month, or custom period.
+  * Generate reports on income vs. expenses.
+* Forecasting Module:
+  * Implement Prophet (Meta's forecasting library) to predict future expenses and income based on historical transaction patterns.
+  * Allow users to define financial goals and forecast their achievement.
+* Visualization & Dashboard Module:
+  * Interactive charts and graphs (using Matplotlib, Seaborn) to visualize spending trends, forecasts, and goal progress.
+  * A central dashboard providing a holistic financial overview.
+* Admin Dashboard:
+  * Management of transaction categories.
+  * Monitoring of system usage and data integrity.
+
+## 5.0 Week-wise module implementation and high-level requirements:
+### Milestone 1: Weeks 1-2
+#### Module 1: User Authentication & Basic Transaction Input
+
+* High-Level Requirements:
+
+  * User Registration: Implement a secure user registration system with standard email/password and JWT (JSON Web Token) security.
+  * Login System: Develop a robust login mechanism to authenticate users.
+  * Profile Management: Create user profiles for managing their financial data.
+  * Manual Transaction Input: Design a basic web interface (using Flask or Streamlit) allowing users to manually input individual dummy transactions (e.g., date, amount, description, type: income/expense).
+
+### Milestone 2: Weeks 3-4
+#### Module 2: Transaction Categorization & Basic Reporting
+
+* High-Level Requirements:
+
+  * Automated Categorization: Implement a rule-based or simple NLP (e.g., keyword matching using NLTK) system to automatically assign categories (e.g., 'Groceries', 'Rent', 'Transport') to transaction descriptions. Allow manual override.
+  * Spending Summary Reports: Develop functionality to generate basic reports showing total spending per category, monthly spending summaries, and income vs. expense over a period using Pandas.
+  * Initial Dashboard View: Enhance the UI to display a summary of recent transactions and a basic breakdown of spending by category (e.g., a pie chart or bar chart using Matplotlib/Seaborn).
+
+### Milestone 3: Weeks 5-6
+#### Module 3: Forecasting Engine & Goal Setting
+
+* High-Level Requirements:
+
+  * Historical Data Preparation: Prepare historical transaction data in the format required by the forecasting model (e.g., time series of aggregated daily/weekly/monthly expenses per category).
+  * Prophet Integration: Integrate Prophet (Meta's forecasting library) to generate future expense forecasts for different categories or overall spending.
+  * Financial Goal Setting: Allow users to define financial goals (e.g., "Save $X by Y date," "Reduce spending in category Z by A%").
+  * Forecast Visualization: Update the dashboard to display the forecasted expenses alongside actual historical data (line chart using Matplotlib/Seaborn). Show projected savings based on forecasts.
+
+-----------------
+
 ## 3.0 Objectives
 To address the problems stated above, the project leverages AI to create a more dynamic and intelligent budgeting experience. The primary objectives are:
 * Learn User Behavior: To develop a system that automatically learns and understands individual spending habits from historical data.
