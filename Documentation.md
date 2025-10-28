@@ -38,24 +38,76 @@ Effective budget management is a common challenge for many. The core problems th
   * Monitoring of system usage and data integrity.
 
 ## 5.0 Week-wise module implementation and high-level requirements:
-### Milestone 1: Weeks 1-2
+### Milestone 1: Weeks 1-2 - Foundation and Basic Input
+This milestone focused on setting up the basic application structure, user interaction, and data entry capabilities.
 #### Module 1: User Authentication & Basic Transaction Input
 
-* High-Level Requirements:
+* User Authentication (Mock Implementation):
+  * Requirement: Implement secure user registration and login.
+  * Implementation: For this initial phase, a mock authentication system was implemented using Streamlit's st.session_state.
+       * A simple login screen prompts for a username and password.
+       * Basic validation (checking against a hardcoded password like "123") is performed.
+       * Upon successful "login," a boolean flag st.session_state.logged_in is set to True, and the username is stored in st.session_state.username. The main application interface is conditionally displayed only when logged_in is True.
+       * A "Logout" button resets the logged_in flag and clears session data.
+  * Note: This mock system serves demonstration purposes. A production-ready version would require integrating a proper database for user credentials and implementing secure password hashing and token-based authentication (like JWT, as initially planned).
+* Profile Management (Minimal):
+  * Requirement: Create user profiles for managing financial data.
+  * Implementation: Profile management is currently minimal. The logged-in st.session_state.username is used to display a welcome message and could theoretically be used to associate transactions with users if data persistence were implemented. No separate profile page or settings were built in this phase.
+* Manual Transaction Input:
+  * Requirement: Design a basic web interface for manual transaction input.
+  * Implementation: A user-friendly form was created using st.form("transaction_form").
+     * Input Widgets: Standard Streamlit widgets capture transaction details:
+         * st.date_input for the date.
+         * st.number_input for the amount (with minimum value validation).
+         * st.selectbox for the transaction type ('Expense' or 'Income').
+         * st.text_input for the description.
+     * Data Handling: Upon form submission (st.form_submit_button):
+         * Input validation checks if the description is provided.
+         * The categorize_transaction function (detailed in Milestone 2) is called to determine the category based on the description.
+         * A Python dictionary representing the new transaction (including date, amount, type, description, category, user, and a unique ID based on time.time()) is created.
+         * This dictionary is appended to the st.session_state.transactions list, which acts as the in-memory data store for the current session.
+         * st.rerun() is called to refresh the UI and display the updated data.
+  
 
-  * User Registration: Implement a secure user registration system with standard email/password and JWT (JSON Web Token) security.
-  * Login System: Develop a robust login mechanism to authenticate users.
-  * Profile Management: Create user profiles for managing their financial data.
-  * Manual Transaction Input: Design a basic web interface (using Flask or Streamlit) allowing users to manually input individual dummy transactions (e.g., date, amount, description, type: income/expense).
-
-### Milestone 2: Weeks 3-4
+### Milestone 2: Weeks 3-4 - Data Processing, Analysis & Visualization
+This milestone focused on adding intelligence through automatic categorization and providing users with insights through reports and charts.
 #### Module 2: Transaction Categorization & Basic Reporting
 
-* High-Level Requirements:
-
-  * Automated Categorization: Implement a rule-based or simple NLP (e.g., keyword matching using NLTK) system to automatically assign categories (e.g., 'Groceries', 'Rent', 'Transport') to transaction descriptions. Allow manual override.
-  * Spending Summary Reports: Develop functionality to generate basic reports showing total spending per category, monthly spending summaries, and income vs. expense over a period using Pandas.
-  * Initial Dashboard View: Enhance the UI to display a summary of recent transactions and a basic breakdown of spending by category (e.g., a pie chart or bar chart using Matplotlib/Seaborn).
+  * Automated Transaction Categorization:
+       *  Requirement: Implement a rule-based system for automatic categorization based on descriptions, allowing overrides.
+       * Implementation:
+           * Keyword Dictionary: A comprehensive Python dictionary (CATEGORIES_KEYWORDS) maps predefined category names to lists of relevant keywords. This serves as the rule-set.
+           * Manual Entry Categorization: The categorize_transaction function iterates through the keyword dictionary for manually added transactions, assigning the first category whose keywords match the transaction description (case-insensitive). Income transactions are handled separately.
+           * CSV Upload Categorization: The process_uploaded_data function implements a vectorized approach for efficiency with large files:
+               * It first standardizes column names and handles date/amount/type processing.
+               * It prioritizes categorization based on keywords found in the 'description' column for rows that have a non-blank description.
+               * For rows where the 'description' was originally blank, it falls back to using the 'category' value provided in the uploaded CSV file (if available and valid). This ensures data from pre-categorized files is respected when no description is present.
+               * It populates blank 'description' fields based on the final determined category (e.g., "Uploaded: Groceries") for better clarity in the editor.
+          * Manual Override: While not a separate button, the "Manage Transactions" table (st.data_editor) allows users to directly edit the 'Category' field (using a dropdown populated from CATEGORIES_KEYWORDS), effectively providing manual override capability.
+* Spending Summary Reports & Analysis:
+   * Requirement: Generate reports on spending per category, monthly summaries, and income vs. expenses using Pandas.
+   * Implementation:
+        * Data Preparation: The core st.session_state.transactions list is converted into a Pandas DataFrame (df) at the start of the analysis section. Dates are converted to datetime objects. An expenses_df is created by filtering df for 'Expense' types.
+        * Income vs. Expense: Total income and expense are calculated using Pandas .sum() on the filtered DataFrame. Net savings is derived, and these three key figures are displayed prominently using st.metric.
+        * Monthly Spending (All Time): Pandas resample('ME') (Month End) is used on the expenses_df (with 'Date' as the index) to calculate the total expense for each month across all years. This is displayed as a time-series line chart using st.line_chart.
+        * Monthly Breakdown (By Year): To handle potentially long time spans without creating excessively wide tables:
+            * The 'Year' is extracted from the 'Date'.
+            * A st.selectbox allows the user to choose a specific year.
+            * The expenses_df is filtered for the selected year.
+            * A Pandas pivot_table is created using this filtered data, showing categories as rows, months (YYYY-MM) as columns, and the sum of amounts as values. This table is displayed using st.dataframe.
+* Initial Dashboard View:
+   * Requirement: Enhance UI with summaries and charts (Pie/Bar) using Matplotlib/Seaborn.
+   * Implementation:
+      * Layout: st.columns is used to arrange metrics and charts side-by-side.
+      * Pie Chart:
+         * Expenses are grouped by category using Pandas groupby().
+         * Small categories (e.g., <2% of total) are aggregated into an 'Other' slice for clarity.
+         * Matplotlib and Seaborn (plt.subplots, ax.pie, sns.color_palette) are used to generate the pie chart visualization.
+         * The chart is displayed in Streamlit using st.pyplot(fig).
+      * Bar Chart:
+         * The same grouped category spending data is used.
+         * Streamlit's native st.bar_chart provides an alternative, interactive view of spending per category.
+      * Dynamic Updates: All reports and charts automatically update whenever st.session_state.transactions changes (due to manual additions, uploads, or edits) because the DataFrame is recreated from this state on each script rerun. 
 
 ### Milestone 3: Weeks 5-6
 #### Module 3: Forecasting Engine & Goal Setting
