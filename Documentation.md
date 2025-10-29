@@ -70,44 +70,37 @@ This milestone focused on setting up the basic application structure, user inter
   
 
 ### Milestone 2: Weeks 3-4 - Data Processing, Analysis & Visualization
-This milestone focused on adding intelligence through automatic categorization and providing users with insights through reports and charts.
+This milestone integrated Natural Language Processing (NLP) for categorization and provided data analysis capabilities.
 #### Module 2: Transaction Categorization & Basic Reporting
 
   * Automated Transaction Categorization:
-       *  Requirement: Implement a rule-based system for automatic categorization based on descriptions, allowing overrides.
+       *  Requirement: Implement a rule-based or simple NLP system using NLTK for automatic categorization.
        * Implementation:
-           * Keyword Dictionary: A comprehensive Python dictionary (CATEGORIES_KEYWORDS) maps predefined category names to lists of relevant keywords. This serves as the rule-set.
-           * Manual Entry Categorization: The categorize_transaction function iterates through the keyword dictionary for manually added transactions, assigning the first category whose keywords match the transaction description (case-insensitive). Income transactions are handled separately.
-           * CSV Upload Categorization: The process_uploaded_data function implements a vectorized approach for efficiency with large files:
-               * It first standardizes column names and handles date/amount/type processing.
-               * It prioritizes categorization based on keywords found in the 'description' column for rows that have a non-blank description.
-               * For rows where the 'description' was originally blank, it falls back to using the 'category' value provided in the uploaded CSV file (if available and valid). This ensures data from pre-categorized files is respected when no description is present.
-               * It populates blank 'description' fields based on the final determined category (e.g., "Uploaded: Groceries") for better clarity in the editor.
-          * Manual Override: While not a separate button, the "Manage Transactions" table (st.data_editor) allows users to directly edit the 'Category' field (using a dropdown populated from CATEGORIES_KEYWORDS), effectively providing manual override capability.
-* Spending Summary Reports & Analysis:
-   * Requirement: Generate reports on spending per category, monthly summaries, and income vs. expenses using Pandas.
-   * Implementation:
-        * Data Preparation: The core st.session_state.transactions list is converted into a Pandas DataFrame (df) at the start of the analysis section. Dates are converted to datetime objects. An expenses_df is created by filtering df for 'Expense' types.
-        * Income vs. Expense: Total income and expense are calculated using Pandas .sum() on the filtered DataFrame. Net savings is derived, and these three key figures are displayed prominently using st.metric.
-        * Monthly Spending (All Time): Pandas resample('ME') (Month End) is used on the expenses_df (with 'Date' as the index) to calculate the total expense for each month across all years. This is displayed as a time-series line chart using st.line_chart.
-        * Monthly Breakdown (By Year): To handle potentially long time spans without creating excessively wide tables:
-            * The 'Year' is extracted from the 'Date'.
-            * A st.selectbox allows the user to choose a specific year.
-            * The expenses_df is filtered for the selected year.
-            * A Pandas pivot_table is created using this filtered data, showing categories as rows, months (YYYY-MM) as columns, and the sum of amounts as values. This table is displayed using st.dataframe.
-* Initial Dashboard View:
-   * Requirement: Enhance UI with summaries and charts (Pie/Bar) using Matplotlib/Seaborn.
-   * Implementation:
-      * Layout: st.columns is used to arrange metrics and charts side-by-side.
-      * Pie Chart:
-         * Expenses are grouped by category using Pandas groupby().
-         * Small categories (e.g., <2% of total) are aggregated into an 'Other' slice for clarity.
-         * Matplotlib and Seaborn (plt.subplots, ax.pie, sns.color_palette) are used to generate the pie chart visualization.
-         * The chart is displayed in Streamlit using st.pyplot(fig).
-      * Bar Chart:
-         * The same grouped category spending data is used.
-         * Streamlit's native st.bar_chart provides an alternative, interactive view of spending per category.
-      * Dynamic Updates: All reports and charts automatically update whenever st.session_state.transactions changes (due to manual additions, uploads, or edits) because the DataFrame is recreated from this state on each script rerun. 
+           * NLTK Setup: The application imports the nltk library and ensures the necessary data packages (stopwords corpus and punkt tokenizer) are downloaded. English stopwords are loaded into a set for efficient filtering.
+           * Keyword Dictionary: The CATEGORIES_KEYWORDS dictionary is maintained, mapping category names to sets of relevant single keywords (optimized for token matching).
+           * categorize_transaction_nltk Function: This core function performs categorization:
+             * It takes the description and trans_type.
+             * Tokenization: The description is converted to lowercase and split into individual words (tokens) using nltk.word_tokenize.
+             * Filtering: Punctuation and common English words (stopwords from nltk.corpus.stopwords) are removed, leaving only potentially meaningful keywords.
+             * Keyword Matching: The remaining tokens are compared against the keyword sets defined in CATEGORIES_KEYWORDS. Set intersection (isdisjoint) is used for efficient matching. The first category whose keyword set overlaps with the transaction's tokens is assigned. Income transactions are handled as a special case. If no keywords match, the category defaults to 'Other'.
+           * Application:
+              * This NLTK function is called when a user submits a manual transaction via the form.
+              * For CSV uploads, the process_uploaded_data function uses Pandas' df.apply() method to execute categorize_transaction_nltk on each row of the uploaded data, processing the 'description' and 'Type' columns. Note: This row-by-row NLTK application is less performant on large files than pure Pandas string methods but fulfills the NLTK requirement.
+              * A fallback mechanism uses the original category from the CSV if the NLTK process results in 'Other' and the original description was blank. Blank descriptions are also filled post-categorization (e.g., "Uploaded: Dining"). 
+           * Manual Override: The st.data_editor in the "Manage Transactions" section allows users to manually change the category assigned by NLTK using a dropdown, providing the override capability.
+  * Spending Summary Reports & Analysis:
+    * Requirement: Generate reports on spending, monthly summaries, and income vs. expenses using Pandas.
+    * Implementation:
+      * Data Preparation: Creates Pandas DataFrames (df, expenses_df) from st.session_state.transactions. Dates are converted/validated.
+      * Income vs. Expense: Calculates totals and net savings, displayed using st.metric.
+      * Monthly Spending (All Time): Uses Pandas resample('ME') to aggregate total monthly expenses, displayed with st.line_chart.
+      * Monthly Breakdown (By Year): Includes a st.selectbox for year selection. Filters the data for the chosen year and displays a pivot_table (categories vs. months) using st.dataframe.         
+  * Dashboard View:
+    * Implementation:
+      * Uses st.columns for layout.
+      * Pie Chart: Generated using Matplotlib/Seaborn showing category spending percentages (small slices grouped). Displayed via st.pyplot.
+      * Bar Chart: Uses st.bar_chart for an alternative view of category spending totals.
+      * Dynamic Updates: Visualizations refresh automatically when transaction data changes.
 
 ### Milestone 3: Weeks 5-6
 #### Module 3: Forecasting Engine & Goal Setting
