@@ -1,4 +1,3 @@
-# --- Imports ---
 import streamlit as st
 import pandas as pd
 from datetime import date
@@ -352,3 +351,4 @@ else:
     # if no transactions exist in the session state
     else:
         st.info("Add transactions or upload a CSV to get started.")
+
