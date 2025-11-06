@@ -105,12 +105,48 @@ This milestone integrated Natural Language Processing (NLP) for categorization a
 ### Milestone 3: Weeks 5-6
 #### Module 3: Forecasting Engine & Goal Setting
 
-* High-Level Requirements:
+This milestone integrated predictive analytics using Meta's **Prophet** library. The goal was to transform the historical tracker into a proactive financial planning tool, allowing users to anticipate future spending patterns.
 
-  * Historical Data Preparation: Prepare historical transaction data in the format required by the forecasting model (e.g., time series of aggregated daily/weekly/monthly expenses per category).
-  * Prophet Integration: Integrate Prophet (Meta's forecasting library) to generate future expense forecasts for different categories or overall spending.
-  * Financial Goal Setting: Allow users to define financial goals (e.g., "Save $X by Y date," "Reduce spending in category Z by A%").
-  * Forecast Visualization: Update the dashboard to display the forecasted expenses alongside actual historical data (line chart using Matplotlib/Seaborn). Show projected savings based on forecasts.
+* **Historical Data Preparation:**
+    * **Requirement:** Prepare historical transaction data in the format required by the forecasting model (e.g., time series of aggregated daily/weekly/monthly expenses per category).
+    * **Implementation:**
+        * **Data Source:** The engine uses the `expenses_df` DataFrame, ensuring that only cleaned, validated, and dated 'Expense' transactions are used.
+        * **Aggregation:** To forecast *overall* spending, individual transactions are aggregated into a single sum for each day. This is achieved using Pandas: `daily_expenses = expenses_df.set_index('Date').resample('D')['Amount'].sum().reset_index()`. The `resample('D')` function groups data into daily bins and fills missing days with `0`, which is critical for the time-series model.
+        * **Prophet Formatting:** Prophet requires specific column names: `ds` (datestamp) and `y` (value). The aggregated DataFrame is renamed accordingly: `daily_expenses.rename(columns={'Date': 'ds', 'Amount': 'y'}, inplace=True)`.
+        * **Data Validation:** A check (`if len(daily_expenses.index) < 30:`) ensures at least 30 days of aggregated data exist before offering the forecast option.
+
+* **Prophet Integration:**
+    * **Requirement:** Integrate Prophet (Meta's forecasting library) to generate future expense forecasts for overall spending.
+    * **Implementation:**
+        * **Model Initialization:** A Prophet model is initialized with custom seasonality settings suitable for financial data: `m = Prophet(daily_seasonality=False, weekly_seasonality=True, yearly_seasonality=True, changepoint_prior_scale=0.05)`.
+            * `daily_seasonality=False`: Turned off as the specific time of day is not relevant.
+            * `weekly_seasonality=True`: **Enabled** to capture different spending patterns on weekdays vs. weekends.
+            * `yearly_seasonality=True`: **Enabled** to capture annual patterns (e.g., holiday spending).
+        * **Model Training & Prediction:**
+            * The model is trained on the historical data: `m.fit(daily_expenses)`.
+            * A `st.slider` allows the user to select a forecast period (30-365 days).
+            * A future DataFrame is created: `future = m.make_future_dataframe(periods=forecast_days)`.
+            * The model generates its forecast: `forecast = m.predict(future)`.
+
+* **Forecast Visualization:**
+    * **Requirement:** Update the dashboard to display forecasted expenses alongside actual historical data.
+    * **Implementation:** Prophet's default plots were replaced with interactive **Altair** charts for better performance and aesthetics.
+        * **Main Forecast Chart:**
+            * **Performance:** To prevent lag from plotting 50,000+ individual points, the historical (actual) data is resampled to a **weekly average** (`actuals_resampled`) before plotting.
+            * **Layered Chart:** The chart is built in three layers: 1) A light blue `mark_area` for the confidence interval (`yhat_lower`, `yhat_upper`), 2) A dark blue `mark_line` for the prediction (`yhat`), and 3) Black `mark_circle` points for the historical weekly averages.
+            * **Legend:** A `st.markdown` block is added to explicitly label what the dots, line, and shaded area represent.
+        * **Forecast Components Chart:**
+            * This chart shows the "ingredients" of the forecast: **Trend, Weekly, and Yearly** seasonality.
+            * To focus on the prediction, the `forecast` DataFrame is **filtered to show only future dates** (`forecast[forecast['ds'] > last_historical_date]`).
+            * This filtered data is plotted using Altair, with each component (`Trend`, `Weekly`, `Yearly`) in its own row.
+        * **Forecast Data Table:** The `forecast` DataFrame is filtered to show *only* future dates, formatted as currency, and displayed in a `st.dataframe`.
+
+* **Financial Goal Setting:**
+    * **Requirement:** Allow users to define financial goals (e.g., "Save $X by Y date," "Reduce spending in category Z by A%").
+    * **Implementation Status:** **Not yet implemented.**
+    * **Future Work:**
+        * **"Save $X by Y date":** This would require building a second Prophet model to forecast **Income**. The app could then predict future **Net Savings** (Forecasted Income - Forecasted Expenses) and sum it over time to project the user's future balance against their goal.
+        * **"Reduce spending in category Z":** This would require allowing the user to select a specific category. The app would then filter the data for *only* that category, train a dedicated Prophet model on it, and display the specific forecast for that category's spending.
 
 -----------------
 
