@@ -194,10 +194,80 @@ This milestone focused on empowering users to manage their budgets proactively a
     * **Integration with AI:** The NLTK categorization function fetches the latest dictionary from the database every time it runs, ensuring immediate updates for all users. The app would then filter the data for *only* that category, train a dedicated Prophet model on it, and display the specific forecast for that category's spending.
 
 
-
-
 -----------------
+### Work flow
 
+graph TD
+    %% Nodes
+    User([User/Admin])
+    Login[Login Interface]
+    DB[(SQLite Database)]
+    
+    %% Logic Nodes
+    Router{Role?}
+    NLTK[[NLTK Categorization Engine]]
+    Prophet[[Prophet Forecasting Engine]]
+    
+    %% Admin Path
+    AdminDash[Admin Dashboard]
+    ManageCat[Manage Categories & Keywords]
+    ViewUsers[View User Stats]
+
+    %% User Path
+    UserDash[User Dashboard]
+    
+    %% User Tabs
+    Upload[Upload CSV]
+    Manual[Manual Entry]
+    Editor[Transaction Editor]
+    Analysis[Financial Analysis]
+    Goals[Goal Setting]
+    Forecast[Future Forecast]
+
+    %% Flow
+    User --> Login
+    Login -- Authenticate --> DB
+    Login --> Router
+    
+    %% Admin Flow
+    Router -- Admin --> AdminDash
+    AdminDash --> ManageCat
+    AdminDash --> ViewUsers
+    ManageCat -- Update Keywords --> DB
+
+    %% User Flow
+    Router -- User --> UserDash
+    
+    %% Tab 1: Log & Manage
+    UserDash --> Upload
+    UserDash --> Manual
+    UserDash --> Editor
+    
+    Upload -- Raw Data --> NLTK
+    Manual -- Description --> NLTK
+    NLTK -- Categorized Data --> DB
+    Editor -- Read/Update/Delete --> DB
+
+    %% Tab 2: Analysis
+    UserDash --> Analysis
+    Analysis -- Fetch Data --> DB
+    
+    %% Tab 3: Goals
+    UserDash --> Goals
+    Goals -- Set Limit --> DB
+    Goals -- Read Progress --> DB
+
+    %% Tab 4: Forecast
+    UserDash --> Forecast
+    Forecast -- Fetch History --> DB
+    DB --> Prophet
+    Prophet -- 30-90 Day Prediction --> Forecast
+
+    %% Styling
+    style DB fill:#f9f,stroke:#333,stroke-width:2px
+    style NLTK fill:#bbf,stroke:#333,stroke-width:2px
+    style Prophet fill:#bbf,stroke:#333,stroke-width:2px
+    
 ## 6.0 Objectives
 To address the problems stated above, the project leverages AI to create a more dynamic and intelligent budgeting experience. The primary objectives are:
 * Learn User Behavior: To develop a system that automatically learns and understands individual spending habits from historical data.
