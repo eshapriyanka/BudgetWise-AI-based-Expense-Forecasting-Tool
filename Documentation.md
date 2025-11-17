@@ -146,7 +146,55 @@ This milestone integrated predictive analytics using Meta's **Prophet** library.
     * **Implementation Status:** **Not yet implemented.**
     * **Future Work:**
         * **"Save $X by Y date":** This would require building a second Prophet model to forecast **Income**. The app could then predict future **Net Savings** (Forecasted Income - Forecasted Expenses) and sum it over time to project the user's future balance against their goal.
-        * **"Reduce spending in category Z":** This would require allowing the user to select a specific category. The app would then filter the data for *only* that category, train a dedicated Prophet model on it, and display the specific forecast for that category's spending.
+        * **"Reduce spending in category Z":** This would require allowing the user to select a specific category.
+
+
+
+### Milestone 4: Weeks 7-8 - Goal Setting & Admin Administration
+This milestone focused on empowering users to manage their budgets proactively and providing administrators with tools to manage the system's data and categorization logic.
+
+#### Module 4: Financial Goal Setting & Tracking
+
+* **Goal Definition:**
+  * **Requirement:** Allow users to define specific financial goals, such as monthly spending limits for different categories (e.g., "Limit Dining to $200/month").
+  * **Implementation:**
+    * **Database Schema:** A new `Goals` table was introduced in SQLite with fields for `goal_id`, `user_id`, `category_name`, and `target_amount`. This ensures goals persist across sessions.
+    * **UI Interaction:** A dedicated "Goals" tab was added. It features a form (`st.form`) where users select an expense category from a dropdown (populated dynamically from the database) and input a monetary limit.
+    * **Logic:** The `save_goal_db` function handles the logic. It checks if a goal for that category already exists for the user. If it does, it updates the existing amount; otherwise, it creates a new record.
+
+* **Real-Time Progress Tracking:**
+  * **Requirement:** Visualize progress towards goals based on current transaction data.
+  * **Implementation:**
+    * **Data Filtering:** The system automatically filters the `expenses_df` to include only transactions from the **current month** using Pandas time-series functionality (`dt.to_period('M')`).
+    * **Aggregation:** Expenses are grouped by category (`groupby('Category').sum()`) to calculate total "actual" spending for the month.
+    * **Visualization:** The app iterates through the user's saved goals and compares the "Target" vs. "Actual".
+      * **Progress Bars:** Uses `st.progress()` to show a visual percentage bar (0% to 100%).
+      * **Dynamic Alerts:** Conditional logic applies specific UI feedback: Green for within budget, Orange (`st.warning`) for nearing limit (>90%), and Red (`st.error`) for over budget.
+
+#### Module 5: Admin Dashboard & System Management
+
+* **Role-Based Access Control (RBAC):**
+  * **Requirement:** Securely separate standard user access from administrative functions.
+  * **Implementation:**
+    * **Database:** Separate `Users` and `Admins` tables manage credentials.
+    * **Login Logic:** The login process detects the user's role. If the credentials match an entry in the `Admins` table, `st.session_state.role` is set to `'admin'`.
+    * **Interface Toggle:** Admins see a special "Admin Mode 🛠️" toggle in the top navigation bar, allowing seamless switching between User and Admin views.
+
+* **System Monitoring:**
+  * **Requirement:** Monitor system usage and data integrity.
+  * **Implementation:**
+    * **Metrics:** The Admin Dashboard displays high-level KPIs using `st.metric`: Total Registered Users, Total Transactions in DB, and Active Goals. These are fetched via efficient SQL `COUNT` queries.
+    * **Data Inspection:** A raw view of the database schema and column types (`df.info()`) is exposed to help admins debug data quality issues.
+
+* **Dynamic Category Management:**
+  * **Requirement:** Allow admins to manage transaction categories and keywords without modifying the source code.
+  * **Implementation:**
+    * **Database-Driven Logic:** Categories are no longer hardcoded in Python. They are stored in a `Categories` table (`category_name`, `keywords`).
+    * **Management UI:** Admins can use a form to Create New Categories or Add Keywords to existing ones.
+    * **Integration with AI:** The NLTK categorization function fetches the latest dictionary from the database every time it runs, ensuring immediate updates for all users. The app would then filter the data for *only* that category, train a dedicated Prophet model on it, and display the specific forecast for that category's spending.
+
+
+
 
 -----------------
 
