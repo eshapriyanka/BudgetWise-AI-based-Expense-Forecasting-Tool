@@ -178,7 +178,7 @@ This milestone focused on empowering users to manage their budgets proactively a
   * **Implementation:**
     * **Database:** Separate `Users` and `Admins` tables manage credentials.
     * **Login Logic:** The login process detects the user's role. If the credentials match an entry in the `Admins` table, `st.session_state.role` is set to `'admin'`.
-    * **Interface Toggle:** Admins see a special "Admin Mode 🛠️" toggle in the top navigation bar, allowing seamless switching between User and Admin views.
+    * **Interface Toggle:** Admins see a special "Admin Mode" toggle in the top navigation bar, allowing seamless switching between User and Admin views.
 
 * **System Monitoring:**
   * **Requirement:** Monitor system usage and data integrity.
