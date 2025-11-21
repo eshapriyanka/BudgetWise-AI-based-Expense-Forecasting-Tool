@@ -92,7 +92,6 @@ Prerequisites: Ensure you have Python 3.8 or higher installed.
     ```bash
     pip install streamlit pandas matplotlib seaborn nltk prophet altair
     ```
-    *(Note: Prophet may require additional system dependencies depending on your OS. Refer to Prophet's installation documentation if you encounter issues.)*
 
 4.  **Run the Application**
     Launch the Streamlit server:
