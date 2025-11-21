@@ -62,3 +62,46 @@ graph TD
         AdminDash --> ManageCat[Manage Keywords]
         ManageCat -- Update Rules --> DB
     end
+```
+
+
+## Installation & Setup
+
+Prerequisites: Ensure you have Python 3.8 or higher installed.
+
+1.  **Clone the Repository**
+    ```bash
+    git clone [https://github.com/eshapriyanka/BudgetWise-AI-based-Expense-Forecasting-Tool](https://github.com/eshapriyanka/BudgetWise-AI-based-Expense-Forecasting-Tool.git)
+    cd budgetwise
+    ```
+
+2.  **Set Up a Virtual Environment (Recommended)**
+    It is best practice to use a virtual environment to manage dependencies.
+    ```bash
+    # For Windows
+    python -m venv venv
+    .\venv\Scripts\activate
+
+    # For macOS/Linux
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install Dependencies**
+    Install the necessary Python libraries used in the project:
+    ```bash
+    pip install streamlit pandas matplotlib seaborn nltk prophet altair
+    ```
+    *(Note: Prophet may require additional system dependencies depending on your OS. Refer to Prophet's installation documentation if you encounter issues.)*
+
+4.  **Run the Application**
+    Launch the Streamlit server:
+    ```bash
+    streamlit run app.py
+    ```
+
+5.  **First Run Initialization**
+    * The application will automatically handle the initial setup on the first launch.
+    * It will create the local SQLite database file (`budgetwise_pro.db`) and populate it with the default transaction categories.
+    * It will automatically download necessary NLTK data packages (`stopwords` and `punkt`) for the NLP engine.
+    * The app should open automatically in your default web browser at `http://localhost:8501`.
