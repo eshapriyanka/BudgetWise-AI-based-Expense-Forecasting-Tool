@@ -53,6 +53,9 @@ This milestone focused on setting up the basic application structure, user inter
 * Profile Management (Minimal):
   * Requirement: Create user profiles for managing financial data.
   * Implementation: Profile management is currently minimal. The logged-in st.session_state.username is used to display a welcome message and could theoretically be used to associate transactions with users if data persistence were implemented. No separate profile page or settings were built in this phase.
+
+   <img src="images/login_signup.png" width="600">
+
 * Manual Transaction Input:
   * Requirement: Design a basic web interface for manual transaction input.
   * Implementation: A user-friendly form was created using st.form("transaction_form").
@@ -67,6 +70,8 @@ This milestone focused on setting up the basic application structure, user inter
          * A Python dictionary representing the new transaction (including date, amount, type, description, category, user, and a unique ID based on time.time()) is created.
          * This dictionary is appended to the st.session_state.transactions list, which acts as the in-memory data store for the current session.
          * st.rerun() is called to refresh the UI and display the updated data.
+
+          <img src="images/user's_1st page.png" width="600">
   
 
 ### Milestone 2: Weeks 3-4 - Data Processing, Analysis & Visualization
@@ -77,17 +82,26 @@ This milestone integrated Natural Language Processing (NLP) for categorization a
        *  Requirement: Implement a rule-based or simple NLP system using NLTK for automatic categorization.
        * Implementation:
            * NLTK Setup: The application imports the nltk library and ensures the necessary data packages (stopwords corpus and punkt tokenizer) are downloaded. English stopwords are loaded into a set for efficient filtering.
+             
+             <img src="images/NLTKsetup.png" width="600"> 
+             
            * Keyword Dictionary: The CATEGORIES_KEYWORDS dictionary is maintained, mapping category names to sets of relevant single keywords (optimized for token matching).
            * categorize_transaction_nltk Function: This core function performs categorization:
              * It takes the description and trans_type.
              * Tokenization: The description is converted to lowercase and split into individual words (tokens) using nltk.word_tokenize.
              * Filtering: Punctuation and common English words (stopwords from nltk.corpus.stopwords) are removed, leaving only potentially meaningful keywords.
              * Keyword Matching: The remaining tokens are compared against the keyword sets defined in CATEGORIES_KEYWORDS. Set intersection (isdisjoint) is used for efficient matching. The first category whose keyword set overlaps with the transaction's tokens is assigned. Income transactions are handled as a special case. If no keywords match, the category defaults to 'Other'.
+               
+               <img src="images/categorize.png" width="600">
+               
            * Application:
               * This NLTK function is called when a user submits a manual transaction via the form.
               * For CSV uploads, the process_uploaded_data function uses Pandas' df.apply() method to execute categorize_transaction_nltk on each row of the uploaded data, processing the 'description' and 'Type' columns. Note: This row-by-row NLTK application is less performant on large files than pure Pandas string methods but fulfills the NLTK requirement.
               * A fallback mechanism uses the original category from the CSV if the NLTK process results in 'Other' and the original description was blank. Blank descriptions are also filled post-categorization (e.g., "Uploaded: Dining"). 
            * Manual Override: The st.data_editor in the "Manage Transactions" section allows users to manually change the category assigned by NLTK using a dropdown, providing the override capability.
+             
+         <img src="images/Edit_transactions.png" width="600">
+             
   * Spending Summary Reports & Analysis:
     * Requirement: Generate reports on spending, monthly summaries, and income vs. expenses using Pandas.
     * Implementation:
@@ -101,6 +115,9 @@ This milestone integrated Natural Language Processing (NLP) for categorization a
       * Pie Chart: Generated using Matplotlib/Seaborn showing category spending percentages (small slices grouped). Displayed via st.pyplot.
       * Bar Chart: Uses st.bar_chart for an alternative view of category spending totals.
       * Dynamic Updates: Visualizations refresh automatically when transaction data changes.
+      
+       <img src="images/user analysis.png" width="600"> 
+
 
 ### Milestone 3: Weeks 5-6
 #### Module 3: Forecasting Engine & Goal Setting
@@ -133,6 +150,9 @@ This milestone integrated predictive analytics using Meta's **Prophet** library.
     * **Implementation:** Prophet's default plots were replaced with interactive **Altair** charts for better performance and aesthetics.
         * **Main Forecast Chart:**
             * **Performance:** To prevent lag from plotting 50,000+ individual points, the historical (actual) data is resampled to a **weekly average** (`actuals_resampled`) before plotting.
+              
+             <img src="images/forecastCode.png" width="600">
+          
             * **Layered Chart:** The chart is built in three layers: 1) A light blue `mark_area` for the confidence interval (`yhat_lower`, `yhat_upper`), 2) A dark blue `mark_line` for the prediction (`yhat`), and 3) Black `mark_circle` points for the historical weekly averages.
             * **Legend:** A `st.markdown` block is added to explicitly label what the dots, line, and shaded area represent.
         * **Forecast Components Chart:**
@@ -140,15 +160,16 @@ This milestone integrated predictive analytics using Meta's **Prophet** library.
             * To focus on the prediction, the `forecast` DataFrame is **filtered to show only future dates** (`forecast[forecast['ds'] > last_historical_date]`).
             * This filtered data is plotted using Altair, with each component (`Trend`, `Weekly`, `Yearly`) in its own row.
         * **Forecast Data Table:** The `forecast` DataFrame is filtered to show *only* future dates, formatted as currency, and displayed in a `st.dataframe`.
-
+          
+            <img src="images/forecast.png" width="600">
+            
 * **Financial Goal Setting:**
     * **Requirement:** Allow users to define financial goals (e.g., "Save $X by Y date," "Reduce spending in category Z by A%").
     * **Implementation Status:** **Not yet implemented.**
     * **Future Work:**
         * **"Save $X by Y date":** This would require building a second Prophet model to forecast **Income**. The app could then predict future **Net Savings** (Forecasted Income - Forecasted Expenses) and sum it over time to project the user's future balance against their goal.
         * **"Reduce spending in category Z":** This would require allowing the user to select a specific category.
-
-
+ 
 
 ### Milestone 4: Weeks 7-8 - Goal Setting & Admin Administration
 This milestone focused on empowering users to manage their budgets proactively and providing administrators with tools to manage the system's data and categorization logic.
@@ -170,6 +191,8 @@ This milestone focused on empowering users to manage their budgets proactively a
     * **Visualization:** The app iterates through the user's saved goals and compares the "Target" vs. "Actual".
       * **Progress Bars:** Uses `st.progress()` to show a visual percentage bar (0% to 100%).
       * **Dynamic Alerts:** Conditional logic applies specific UI feedback: Green for within budget, Orange (`st.warning`) for nearing limit (>90%), and Red (`st.error`) for over budget.
+      
+          <img src="images/goals.png" width="600">
 
 #### Module 5: Admin Dashboard & System Management
 
@@ -185,6 +208,7 @@ This milestone focused on empowering users to manage their budgets proactively a
   * **Implementation:**
     * **Metrics:** The Admin Dashboard displays high-level KPIs using `st.metric`: Total Registered Users, Total Transactions in DB, and Active Goals. These are fetched via efficient SQL `COUNT` queries.
     * **Data Inspection:** A raw view of the database schema and column types (`df.info()`) is exposed to help admins debug data quality issues.
+                            <img src="images/adminDashboard.png" width="600">
 
 * **Dynamic Category Management:**
   * **Requirement:** Allow admins to manage transaction categories and keywords without modifying the source code.
@@ -192,7 +216,8 @@ This milestone focused on empowering users to manage their budgets proactively a
     * **Database-Driven Logic:** Categories are no longer hardcoded in Python. They are stored in a `Categories` table (`category_name`, `keywords`).
     * **Management UI:** Admins can use a form to Create New Categories or Add Keywords to existing ones.
     * **Integration with AI:** The NLTK categorization function fetches the latest dictionary from the database every time it runs, ensuring immediate updates for all users. The app would then filter the data for *only* that category, train a dedicated Prophet model on it, and display the specific forecast for that category's spending.
-
+   
+      <img src="images/adminsCategoryManagement.png" width="600">
 
 -----------------
 ## 6.0 Objectives
@@ -217,32 +242,20 @@ The project follows a structured lifecycle, progressing from data handling to mo
 * Dashboard & Visualization: Building a user-facing application to display results.
 * Deployment: Hosting the application on a cloud platform.
 
+  <img src="images/archi.png" width="600">
+
 ## 8.1 Feature Engineering
 To enhance model accuracy, several features will be engineered from the raw data:
 * Time-Based Features: Extracting components like the month, day of the week, and seasonality.
 * Behavioral Features: Calculating cumulative spending patterns to understand user habits over time.
 * Categorical Features: Grouping expenses into logical categories (e.g., groceries, transport, entertainment).
 
-## 9.0 Forecasting Models
-The tool will implement and compare several forecasting models to ensure the highest accuracy.
+## 9.0 Forecasting Model
 
-### 9.1 Time Series Models: ARIMA/SARIMA
-Time series models are ideal for data with clear temporal trends.
-They are effective at capturing seasonality and cyclical patterns in spending data.
-Specific models to be implemented include ARIMA (Autoregressive Integrated Moving Average) and SARIMA (Seasonal ARIMA).
-
-### 9.2 Prophet Model
 Developed by Facebook, Prophet is a powerful and user-friendly forecasting model.
 It is robust in handling seasonality and holidays, which are common in expense data.
 It offers a simple API and produces fast, reliable results.
 
-### 9.3 Deep Learning Models: RNNs & LSTMs
-For more complex and long-term forecasting, advanced deep learning techniques will be used.
-Recurrent Neural Networks (RNNs) and Long Short-Term Memory (LSTM) networks are specifically designed for sequential data like monthly expenses.
-These models excel at capturing long-term dependencies in spending habits that simpler models might miss.
-
-### 9.4 Anomaly Detection
-The system will also include a module to identify unusual spending activities. This helps users quickly spot potential fraudulent transactions or significant deviations from their normal budget, such as a sudden large purchase.
 
 ## 10.0 Model Evaluation
 The performance of all forecasting models will be rigorously evaluated using standard statistical metrics:
@@ -268,23 +281,22 @@ The main dashboard will provide a comprehensive summary of the user's finances:
 * An interactive graph displaying future expense forecasts.
 
 ### 11.2 Budget Alerts
-The system will send automated alerts via push notifications or emails to warn users. For example: “⚠️ You are on track to overshoot your travel budget by 20% this month”.
-
-### 11.3 API Integration
-To ensure data is always up-to-date, the tool will support integration with:
-* Google Sheets: for automatic data synchronization.
-* Bank Feeds: to pull in real-time transaction data.
-
-### 11.4 Scenario Analysis
-An advanced feature will allow users to perform "what-if" analysis. Users can simulate the impact of financial changes (e.g., “What if my rent increases by 10%?”) and the AI will forecast the effect on their overall budget.
+The system will send automated alerts via push notifications or emails to warn users. For example: “ You are on track to overshoot your travel budget by 20% this month”.
 
 
 ## 12.0 Technology Stack
-Programming Language: Python
-* AI/ML Libraries: Scikit-learn, Statsmodels, Prophet, TensorFlow/Keras (for LSTM)
-* Data Visualization: Matplotlib, Seaborn, and Plotly (for interactive charts).
-* Web App Frameworks: Streamlit (for rapid dashboard development), Flask, or Dash.
-* Cloud Deployment: Heroku, Render, AWS, or GCP.
+* **Programming Language:** Python
+* **Web Application Framework:** Streamlit
+* **Database:** SQLite (Local Relational Database)
+* **Data Processing & Manipulation:** Pandas
+* **AI & Machine Learning Libraries:**
+    * **NLTK (Natural Language Toolkit):** Used for NLP-based automatic transaction categorization.
+    * **Prophet (by Meta):** Used for time-series forecasting of future expenses.
+* **Data Visualization:**
+    * **Altair:** For interactive forecasting charts.
+    * **Matplotlib & Seaborn:** For static statistical charts (e.g., category breakdowns).
+* **Security:** Hashlib (for SHA-256 password hashing).
+* **Deployment Environment:** Local Execution.
 
 ## 13.0 Security and Compliance
 Handling sensitive financial data requires a strong focus on security.
