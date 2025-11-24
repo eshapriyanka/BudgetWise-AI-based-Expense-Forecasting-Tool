@@ -306,7 +306,6 @@ Handling sensitive financial data requires a strong focus on security.
 
 ## 14.0 Future Enhancements
 The project has a clear roadmap for future development:
-* NLP for Transaction Categorization: Use Natural Language Processing to automatically categorize expenses from transaction descriptions.
 * Third-Party Integration: Integrate with popular personal finance apps (like Mint or YNAB) for a more connected experience.
 * AI Chat Assistant: Develop an AI-powered chatbot to provide users with budgeting advice and answer financial questions.
 
